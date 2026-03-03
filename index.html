@@ -1,1 +1,697 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KV Infra & Interiors — Building Dreams, Enhancing Spaces</title>
+<meta name="description" content= — P
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<!-- ══════════════════════════════════════════
+     FIREBASE CONFIG — Replace with your own!
+     Get from: Firebase Console → Project Settings → Your Apps
+     ══════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ─── PASTE YOUR CONFIG HERE ───────────────
+  const firebaseConfig = {
+    apiKey:            "YOUR_API_KEY",
+    authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId:         "YOUR_PROJECT_ID",
+    storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId:             "YOUR_APP_ID"
+  };
+  // ──────────────────────────────────────────
+
+  let app, db, fbReady = false;
+  try {
+    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+      app = initializeApp(firebaseConfig);
+      db  = getFirestore(app);
+      fbReady = true;
+    }
+  } catch(e) { console.warn("Firebase not configured – using localStorage fallback."); }
+
+  // Expose to global scope for inline handlers
+  window._FB = { db, fbReady, collection, addDoc, getDocs, query, orderBy, serverTimestamp };
+</script>
+
+<style>
+:root {
+  --navy:#0b1a3d; --navy2:#152447; --gold:#c8a021; --gold2:#e8bc2a;
+  --gold3:#f5d060; --white:#fff; --off:#f7f5ef; --gray:#64748b;
+  --lgray:#e2e8f0; --dark:#06101f;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Raleway',sans-serif;background:var(--white);color:var(--navy);overflow-x:hidden}
+h1,h2,h3{font-family:'Playfair Display',serif}
+a{text-decoration:none}
+img{display:block;max-width:100%}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--dark)}
+::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(6,16,31,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(200,160,33,.2);transition:box-shadow .3s}
+nav.scrolled{box-shadow:0 4px 30px rgba(0,0,0,.5);border-bottom-color:rgba(200,160,33,.4)}
+.nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:72px}
+.nav-logo{display:flex;align-items:center;gap:13px}
+.logo-box{width:50px;height:50px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(200,160,33,.4);flex-shrink:0}
+.logo-box svg{width:34px;height:34px}
+.logo-text .t1{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:var(--white);line-height:1}
+.logo-text .t1 span{color:var(--gold2)}
+.logo-text .t2{font-size:9px;color:rgba(255,255,255,.45);letter-spacing:2.5px;text-transform:uppercase;margin-top:2px;display:block}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{color:rgba(255,255,255,.8);padding:8px 14px;border-radius:7px;font-size:13.5px;font-weight:600;transition:color .3s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:0;height:1.5px;background:var(--gold2);border-radius:1px;transition:width .3s}
+.nav-links a:hover,.nav-links a.active{color:var(--gold2)}
+.nav-links a:hover::after,.nav-links a.active::after{width:55%}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-wa{width:42px;height:42px;border-radius:9px;background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.3);color:#25d366;display:flex;align-items:center;justify-content:center;font-size:19px;transition:all .3s}
+.nav-wa:hover{background:#25d366;color:var(--white)}
+.nav-cta{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);padding:10px 22px;border-radius:9px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:7px;transition:all .3s;box-shadow:0 4px 16px rgba(200,160,33,.35)}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,160,33,.5)}
+.hamburger{display:none;flex-direction:column;gap:5px;padding:8px;cursor:pointer}
+.hamburger span{display:block;width:23px;height:2px;background:var(--gold2);border-radius:2px;transition:all .3s}
+
+/* ── MOBILE MENU ── */
+.mob-menu{display:none;position:fixed;inset:0;z-index:999;background:rgba(6,16,31,.99);flex-direction:column;align-items:center;justify-content:center;gap:22px}
+.mob-menu.open{display:flex}
+.mob-menu a{color:var(--white);font-family:'Playfair Display',serif;font-size:24px;font-weight:700;transition:color .3s}
+.mob-menu a:hover{color:var(--gold2)}
+.mob-close{position:absolute;top:22px;right:22px;color:var(--white);font-size:26px;background:none;border:none;cursor:pointer}
+
+/* ── HERO SLIDER ── */
+#home{height:100vh;min-height:620px;position:relative;overflow:hidden}
+.slides-wrap{display:flex;height:100%;transition:transform .9s cubic-bezier(.77,0,.18,1);will-change:transform}
+.slide{min-width:100%;height:100%;position:relative;background-size:cover;background-position:center}
+.slide-overlay{position:absolute;inset:0;background:linear-gradient(115deg,rgba(6,16,31,.90) 0%,rgba(11,26,61,.70) 55%,rgba(6,16,31,.35) 100%)}
+.slide-1{background-image:url('https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1800&q=80')}
+.slide-2{background-image:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1800&q=80')}
+.slide-3{background-image:url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1800&q=80')}
+.slide-4{background-image:url('https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1800&q=80')}
+.slide-content{position:absolute;z-index:3;bottom:15%;left:8%;max-width:640px}
+.slide-badge{display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-size:11px;font-weight:800;padding:6px 16px;border-radius:30px;letter-spacing:2px;text-transform:uppercase}
+.slide-title{font-size:clamp(38px,6.5vw,74px);color:var(--white);line-height:1.06;margin-bottom:18px}
+.slide-title em{color:var(--gold2);font-style:normal}
+.slide-desc{color:rgba(255,255,255,.78);font-size:16px;line-height:1.75;margin-bottom:34px;max-width:520px}
+.slide-btns{display:flex;gap:14px;flex-wrap:wrap}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);padding:14px 32px;border-radius:10px;font-weight:800;font-size:15px;display:inline-flex;align-items:center;gap:8px;transition:all .3s;box-shadow:0 6px 20px rgba(200,160,33,.4);border:none;cursor:pointer;font-family:'Raleway',sans-serif}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(200,160,33,.55)}
+.btn-outline{background:transparent;color:var(--white);padding:14px 32px;border-radius:10px;font-weight:700;font-size:15px;border:2px solid rgba(255,255,255,.35);display:inline-flex;align-items:center;gap:8px;transition:all .3s}
+.btn-outline:hover{border-color:var(--gold2);color:var(--gold2)}
+.slide-dots{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:9px;z-index:10}
+.dot{width:30px;height:4px;border-radius:2px;background:rgba(255,255,255,.3);cursor:pointer;transition:all .3s}
+.dot.active{background:var(--gold2);width:52px}
+.slide-arr{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border-radius:50%;background:rgba(200,160,33,.15);border:2px solid rgba(200,160,33,.4);color:var(--gold2);font-size:17px;z-index:10;display:flex;align-items:center;justify-content:center;transition:all .3s;cursor:pointer}
+.slide-arr:hover{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.arr-l{left:22px}.arr-r{right:22px}
+
+/* ── STATS ── */
+.stats-bar{background:linear-gradient(100deg,var(--navy),var(--navy2));border-top:3px solid var(--gold)}
+.stats-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-block{padding:34px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.08);transition:background .3s}
+.stat-block:last-child{border-right:none}
+.stat-block:hover{background:rgba(200,160,33,.07)}
+.stat-n{font-family:'Playfair Display',serif;font-size:44px;font-weight:900;color:var(--gold2);display:block;line-height:1}
+.stat-l{color:rgba(255,255,255,.65);font-size:11.5px;margin-top:8px;letter-spacing:2px;text-transform:uppercase;font-weight:600}
+
+/* ── SECTIONS ── */
+section{padding:96px 28px}
+.container{max-width:1280px;margin:0 auto}
+.sec-head{text-align:center;margin-bottom:64px}
+.sec-tag{display:inline-block;color:var(--gold);font-size:11px;font-weight:800;letter-spacing:3.5px;text-transform:uppercase;margin-bottom:13px}
+.sec-tag::before,.sec-tag::after{content:'——';margin:0 8px;opacity:.55}
+.sec-h2{font-size:clamp(28px,4.5vw,46px);color:var(--navy);line-height:1.15;margin-bottom:16px}
+.sec-h2 span{color:var(--gold)}
+.sec-p{color:var(--gray);font-size:16px;max-width:580px;margin:0 auto;line-height:1.85}
+.gold-bar{width:60px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold3));border-radius:2px;margin:16px auto 0}
+.rv{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.rv.in{opacity:1;transform:translateY(0)}
+
+/* ── ABOUT ── */
+#about{background:var(--off)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center}
+.about-photos{position:relative;height:510px}
+.ap-main{position:absolute;top:0;left:0;width:73%;height:78%;object-fit:cover;border-radius:14px;box-shadow:0 20px 60px rgba(11,26,61,.2);border:5px solid var(--white)}
+.ap-sub{position:absolute;bottom:0;right:0;width:54%;height:54%;object-fit:cover;border-radius:14px;box-shadow:0 20px 60px rgba(11,26,61,.2);border:5px solid var(--white)}
+.ap-badge{position:absolute;top:47%;left:57%;transform:translate(-50%,-50%);width:116px;height:116px;border-radius:50%;z-index:3;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 12px 36px rgba(200,160,33,.5)}
+.ap-badge .n{font-family:'Playfair Display',serif;font-size:33px;font-weight:900;color:var(--navy);line-height:1}
+.ap-badge .l{font-size:9.5px;font-weight:800;color:var(--navy);text-align:center;letter-spacing:.8px;margin-top:2px}
+.about-body .lead{color:var(--gray);font-size:15.5px;line-height:1.85;margin:20px 0 28px}
+.feat-list{display:flex;flex-direction:column;gap:13px;margin-bottom:34px}
+.feat-item{display:flex;align-items:flex-start;gap:15px;padding:16px 18px;background:var(--white);border-radius:11px;border-left:3px solid var(--gold);box-shadow:0 2px 10px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s}
+.feat-item:hover{transform:translateX(5px);box-shadow:0 4px 20px rgba(200,160,33,.15)}
+.feat-icon{width:40px;height:40px;min-width:40px;background:linear-gradient(135deg,var(--gold),var(--gold3));border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--navy);font-size:16px}
+.feat-text h4{font-size:14px;margin-bottom:2px;font-family:'Raleway',sans-serif;font-weight:700;color:var(--navy)}
+.feat-text p{font-size:12.5px;color:var(--gray);line-height:1.6}
+
+/* ── SERVICES ── */
+#services{background:var(--white)}
+.srv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:26px}
+.srv-card{background:var(--white);border:1px solid var(--lgray);border-radius:18px;padding:38px 28px;position:relative;overflow:hidden;transition:all .4s;box-shadow:0 4px 22px rgba(0,0,0,.06)}
+.srv-card::after{content:'';position:absolute;inset:0;background:linear-gradient(140deg,var(--navy),var(--navy2));transform:translateY(102%);transition:transform .45s cubic-bezier(.4,0,.2,1);z-index:0}
+.srv-card:hover{border-color:var(--gold);transform:translateY(-9px);box-shadow:0 22px 55px rgba(11,26,61,.22)}
+.srv-card:hover::after{transform:translateY(0)}
+.srv-card>*{position:relative;z-index:1}
+.srv-icon{width:70px;height:70px;border-radius:17px;margin-bottom:24px;background:linear-gradient(135deg,rgba(200,160,33,.13),rgba(232,188,42,.07));border:2px solid rgba(200,160,33,.26);display:flex;align-items:center;justify-content:center;transition:all .4s}
+.srv-icon i{font-size:29px;color:var(--gold);transition:all .4s}
+.srv-card:hover .srv-icon{background:linear-gradient(135deg,var(--gold),var(--gold3));border-color:transparent}
+.srv-card:hover .srv-icon i{color:var(--navy)}
+.srv-card h3{font-size:21px;color:var(--navy);margin-bottom:10px;transition:color .4s}
+.srv-card:hover h3{color:var(--white)}
+.srv-card p{color:var(--gray);font-size:14px;line-height:1.8;transition:color .4s}
+.srv-card:hover p{color:rgba(255,255,255,.72)}
+.srv-link{display:inline-flex;align-items:center;gap:7px;color:var(--gold);font-weight:700;font-size:13px;margin-top:18px;transition:gap .3s}
+.srv-link:hover{gap:12px}
+
+/* ── WHY ── */
+#why{background:linear-gradient(140deg,var(--navy) 0%,var(--dark) 100%);position:relative;overflow:hidden}
+#why::before{content:'';position:absolute;top:-200px;right:-150px;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(200,160,33,.07) 0%,transparent 70%);pointer-events:none}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(265px,1fr));gap:22px}
+.why-card{background:rgba(255,255,255,.03);border:1px solid rgba(200,160,33,.17);border-radius:15px;padding:32px 24px;text-align:center;transition:all .3s}
+.why-card:hover{background:rgba(200,160,33,.08);border-color:var(--gold);transform:translateY(-6px)}
+.why-ic{font-size:33px;color:var(--gold2);margin-bottom:16px}
+.why-card h3{color:var(--white);font-size:18px;margin-bottom:10px}
+.why-card p{color:rgba(255,255,255,.57);font-size:14px;line-height:1.75}
+
+/* ── PROJECTS ── */
+#projects{background:var(--off)}
+.proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.proj-item{position:relative;overflow:hidden;border-radius:13px;cursor:pointer}
+.proj-item:first-child{grid-column:span 2}
+.proj-item img{width:100%;height:285px;object-fit:cover;transition:transform .55s;display:block}
+.proj-item:first-child img{height:385px}
+.proj-item:hover img{transform:scale(1.08)}
+.proj-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(6,16,31,.92) 0%,transparent 55%);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:24px}
+.proj-item:hover .proj-ov{opacity:1}
+.proj-ov h3{color:var(--white);font-size:19px;margin-bottom:5px}
+.proj-ov p{color:var(--gold2);font-size:12.5px;font-weight:600;letter-spacing:.8px}
+
+/* ── REVIEWS ── */
+#reviews{background:var(--white)}
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px}
+.rev-card{background:var(--off);border:1px solid var(--lgray);border-radius:17px;padding:32px;position:relative;transition:all .3s}
+.rev-card::before{content:'\201C';position:absolute;top:10px;right:20px;font-size:88px;color:rgba(200,160,33,.1);font-family:'Playfair Display',serif;line-height:1}
+.rev-card:hover{border-color:var(--gold);box-shadow:0 10px 36px rgba(200,160,33,.14);transform:translateY(-5px)}
+.rev-stars{color:var(--gold);font-size:17px;letter-spacing:2px;margin-bottom:13px}
+.rev-card p{color:var(--gray);font-size:15px;line-height:1.85;margin-bottom:18px;font-style:italic}
+.rev-author{display:flex;align-items:center;gap:11px}
+.rev-av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold3));display:flex;align-items:center;justify-content:center;color:var(--navy);font-family:'Playfair Display',serif;font-weight:700;font-size:17px}
+.rev-name{font-weight:700;font-size:14.5px;color:var(--navy)}
+.rev-role{font-size:12px;color:var(--gold);font-weight:600}
+
+/* ── CONTACT ── */
+#contact{background:linear-gradient(140deg,var(--navy),var(--dark))}
+.contact-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:65px;align-items:start}
+.ci h3{color:var(--white);font-size:29px;margin-bottom:14px}
+.ci>p{color:rgba(255,255,255,.6);font-size:15px;line-height:1.85;margin-bottom:36px}
+.cd{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px}
+.cd-icon{width:50px;height:50px;min-width:50px;background:linear-gradient(135deg,var(--gold),var(--gold3));border-radius:11px;display:flex;align-items:center;justify-content:center;color:var(--navy);font-size:19px}
+.cd-text span{color:rgba(255,255,255,.43);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:2px}
+.cd-text strong{color:var(--white);font-size:15.5px}
+.btn-wa-main{display:inline-flex;align-items:center;gap:9px;margin-top:6px;background:linear-gradient(135deg,#25d366,#128c7e);color:var(--white);padding:13px 26px;border-radius:10px;font-weight:800;font-size:15px;transition:all .3s;box-shadow:0 6px 20px rgba(37,211,102,.35)}
+.btn-wa-main:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(37,211,102,.5)}
+.cf{background:rgba(255,255,255,.04);border:1px solid rgba(200,160,33,.2);border-radius:18px;padding:42px}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fg{margin-bottom:16px}
+.fg label{display:block;color:rgba(255,255,255,.6);font-size:12px;font-weight:700;margin-bottom:7px;letter-spacing:.5px;text-transform:uppercase}
+.fg input,.fg select,.fg textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(200,160,33,.2);border-radius:9px;padding:13px 16px;color:var(--white);font-family:'Raleway',sans-serif;font-size:14.5px;outline:none;transition:border-color .3s}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.27)}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold)}
+.fg select option{background:var(--navy2)}
+.fg textarea{resize:vertical;min-height:112px}
+.btn-submit{width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);border:none;padding:16px;border-radius:10px;font-weight:800;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:all .3s;box-shadow:0 6px 20px rgba(200,160,33,.35);font-family:'Raleway',sans-serif}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(200,160,33,.5)}
+.btn-submit:disabled{opacity:.65;cursor:not-allowed;transform:none}
+.wa-note{margin-top:14px;display:flex;align-items:center;gap:10px;background:rgba(37,211,102,.07);border:1px solid rgba(37,211,102,.2);border-radius:9px;padding:11px 15px;color:rgba(255,255,255,.65);font-size:13px}
+.wa-note i{color:#25d366;font-size:17px;flex-shrink:0}
+#cf-status{margin-top:12px;font-size:14px;text-align:center;display:none;padding:11px;border-radius:9px;font-weight:600}
+#cf-status.ok{background:rgba(34,197,94,.12);color:#4ade80;border:1px solid rgba(34,197,94,.28)}
+#cf-status.er{background:rgba(239,68,68,.12);color:#f87171;border:1px solid rgba(239,68,68,.28)}
+
+/* ── FOOTER ── */
+footer{background:var(--dark);border-top:1px solid rgba(200,160,33,.17);padding:65px 28px 0}
+.footer-grid{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.3fr;gap:52px;padding-bottom:52px;border-bottom:1px solid rgba(255,255,255,.07)}
+.fb p{color:rgba(255,255,255,.5);font-size:14px;line-height:1.85;margin:16px 0 24px}
+.socials{display:flex;gap:10px}
+.s-btn{width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.55);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.s-btn:hover{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.fc h4{color:var(--white);font-size:15px;margin-bottom:20px;padding-bottom:12px;position:relative;font-family:'Raleway',sans-serif;font-weight:700}
+.fc h4::after{content:'';position:absolute;bottom:0;left:0;width:30px;height:2px;background:var(--gold)}
+.fc ul{list-style:none}
+.fc ul li{margin-bottom:10px}
+.fc ul li a{color:rgba(255,255,255,.52);font-size:14px;transition:color .3s;display:flex;align-items:center;gap:7px}
+.fc ul li a:hover{color:var(--gold2)}
+.fc ul li a::before{content:'›';color:var(--gold);font-size:16px}
+.fci{display:flex;gap:12px;margin-bottom:14px}
+.fci i{color:var(--gold);font-size:14px;margin-top:3px;flex-shrink:0}
+.fci span{color:rgba(255,255,255,.52);font-size:14px;line-height:1.6}
+.footer-bot{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:20px 0;flex-wrap:wrap;gap:10px}
+.footer-bot p{color:rgba(255,255,255,.3);font-size:13px}
+.footer-bot span{color:var(--gold)}
+
+/* ── FABs ── */
+.fab-wa{position:fixed;bottom:88px;right:26px;z-index:500;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#25d366,#128c7e);color:var(--white);font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(37,211,102,.5);transition:all .3s;animation:waggle 3.5s ease-in-out infinite}
+.fab-wa:hover{transform:scale(1.12);animation:none}
+@keyframes waggle{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-12deg)}95%{transform:rotate(12deg)}}
+#to-top{position:fixed;bottom:26px;right:26px;z-index:500;width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);font-size:16px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(200,160,33,.4);opacity:0;transform:translateY(18px);transition:all .3s}
+#to-top.show{opacity:1;transform:translateY(0)}
+#to-top:hover{transform:translateY(-3px)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1024px){.footer-grid{grid-template-columns:1fr 1fr}.about-grid{gap:44px}.contact-grid{grid-template-columns:1fr;gap:44px}.proj-grid{grid-template-columns:repeat(2,1fr)}.proj-item:first-child{grid-column:span 2}}
+@media(max-width:768px){.nav-links,.nav-right{display:none}.hamburger{display:flex}.stats-inner{grid-template-columns:repeat(2,1fr)}.about-grid{grid-template-columns:1fr}.about-photos{height:350px}.srv-grid,.why-grid{grid-template-columns:1fr}.proj-grid{grid-template-columns:1fr}.proj-item:first-child{grid-column:1}.footer-grid{grid-template-columns:1fr;gap:32px}.cf-row{grid-template-columns:1fr}section{padding:62px 16px}.cf{padding:24px}.slide-arr{display:none}}
+@media(max-width:480px){.stats-inner{grid-template-columns:repeat(2,1fr)}.stat-block{padding:22px 14px}.stat-n{font-size:34px}}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#home" class="nav-logo">
+      <div class="logo-box">
+        <svg viewBox="0 0 36 36" fill="none">
+          <rect x="3" y="14" width="11" height="19" fill="#0b1a3d" rx="1"/>
+          <rect x="5" y="16" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="9" y="16" width="3" height="3" fill="#c8a021" rx="0.5"/>
+          <rect x="5" y="21" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="9" y="21" width="3" height="3" fill="#c8a021" rx="0.5"/>
+          <rect x="6" y="26" width="5" height="7" fill="#c8a021" rx="0.5"/>
+          <rect x="16" y="6" width="13" height="27" fill="#0b1a3d" rx="1"/>
+          <rect x="18" y="9" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="23" y="9" width="3" height="3" fill="#c8a021" rx="0.5"/>
+          <rect x="18" y="15" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="23" y="15" width="3" height="3" fill="#c8a021" rx="0.5"/>
+          <rect x="18" y="21" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="23" y="21" width="3" height="3" fill="#c8a021" rx="0.5"/>
+          <rect x="20" y="27" width="5" height="6" fill="#c8a021" rx="0.5"/>
+          <rect x="2" y="33" width="32" height="1.5" fill="#c8a021" rx="0.75"/>
+          <polygon points="26,2 27.2,5.5 31,5.5 28.2,7.5 29.3,11 26,9 22.7,11 23.8,7.5 21,5.5 24.8,5.5" fill="#e8bc2a"/>
+        </svg>
+      </div>
+      <div class="logo-text"><span class="t1"><span>KV</span> Infra</span><span class="t2">& Interiors</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="#home" class="active">Home</a><a href="#about">About</a>
+      <a href="#services">Services</a><a href="#projects">Projects</a>
+      <a href="#reviews">Reviews</a><a href="#contact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <a href="https://wa.me/919014718381" target="_blank" class="nav-wa"><i class="fab fa-whatsapp"></i></a>
+      <a href="#contact" class="nav-cta"><i class="fas fa-paper-plane"></i> Get Quote</a>
+    </div>
+    <div class="hamburger" onclick="toggleMob()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mob-menu" id="mob-menu">
+  <button class="mob-close" onclick="toggleMob()"><i class="fas fa-xmark"></i></button>
+  <a href="#home" onclick="toggleMob()">Home</a>
+  <a href="#about" onclick="toggleMob()">About Us</a>
+  <a href="#services" onclick="toggleMob()">Services</a>
+  <a href="#projects" onclick="toggleMob()">Projects</a>
+  <a href="#reviews" onclick="toggleMob()">Reviews</a>
+  <a href="#contact" onclick="toggleMob()">Contact</a>
+  <a href="https://wa.me/919014718381" target="_blank" style="color:#25d366;border:2px solid #25d366;padding:11px 30px;border-radius:10px;margin-top:8px"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+</div>
+
+<!-- HERO -->
+<section id="home">
+  <div class="slides-wrap" id="slides">
+    <div class="slide slide-1"><div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-badge"><i class="fas fa-star"></i> Premium Construction</span>
+        <h1 class="slide-title">Building<br><em>Your Dreams,</em><br>Enhancing Spaces.</h1>
+        <p class="slide-desc">KV INFRA &amp; Interiors delivers world-class construction and interior design with unmatched quality across Andhra Pradesh.</p>
+        <div class="slide-btns"><a href="#contact" class="btn-gold"><i class="fas fa-paper-plane"></i> Get Free Quote</a><a href="#services" class="btn-outline"><i class="fas fa-cogs"></i> Our Services</a></div>
+      </div>
+    </div>
+    <div class="slide slide-2"><div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-badge"><i class="fas fa-road"></i> CC Road Works</span>
+        <h1 class="slide-title">Durable<br><em>Road &amp;</em><br>Infrastructure.</h1>
+        <p class="slide-desc">Concrete and cement road construction built with modern techniques for long-lasting community infrastructure.</p>
+        <div class="slide-btns"><a href="#contact" class="btn-gold"><i class="fab fa-whatsapp"></i> WhatsApp Quote</a><a href="#projects" class="btn-outline"><i class="fas fa-images"></i> View Projects</a></div>
+      </div>
+    </div>
+    <div class="slide slide-3"><div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-badge"><i class="fas fa-couch"></i> Interior Design</span>
+        <h1 class="slide-title">Transform<br><em>Your Interior</em><br>Spaces.</h1>
+        <p class="slide-desc">Bespoke interior design solutions tailored to your vision — luxury residential and commercial spaces reimagined.</p>
+        <div class="slide-btns"><a href="#contact" class="btn-gold"><i class="fas fa-paper-plane"></i> Get Free Quote</a><a href="#about" class="btn-outline"><i class="fas fa-info-circle"></i> About Us</a></div>
+      </div>
+    </div>
+    <div class="slide slide-4"><div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-badge"><i class="fas fa-tools"></i> Renovations</span>
+        <h1 class="slide-title">Renovate,<br><em>Upgrade &amp;</em><br>Remodel.</h1>
+        <p class="slide-desc">Complete renovation and remodeling services breathing new life into existing structures with precision craftsmanship.</p>
+        <div class="slide-btns"><a href="#contact" class="btn-gold"><i class="fab fa-whatsapp"></i> WhatsApp Quote</a><a href="#reviews" class="btn-outline"><i class="fas fa-star"></i> Client Reviews</a></div>
+      </div>
+    </div>
+  </div>
+  <button class="slide-arr arr-l" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+  <button class="slide-arr arr-r" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
+  <div class="slide-dots" id="dots">
+    <div class="dot active" onclick="goSlide(0)"></div><div class="dot" onclick="goSlide(1)"></div>
+    <div class="dot" onclick="goSlide(2)"></div><div class="dot" onclick="goSlide(3)"></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar"><div class="stats-inner">
+  <div class="stat-block"><span class="stat-n" data-t="500">0</span><span class="stat-l">Projects Completed</span></div>
+  <div class="stat-block"><span class="stat-n" data-t="12">0</span><span class="stat-l">Years Experience</span></div>
+  <div class="stat-block"><span class="stat-n" data-t="350">0</span><span class="stat-l">Happy Clients</span></div>
+  <div class="stat-block"><span class="stat-n" data-t="25">0</span><span class="stat-l">Expert Team</span></div>
+</div></div>
+
+<!-- ABOUT -->
+<section id="about"><div class="container">
+  <div class="about-grid">
+    <div class="about-photos rv">
+      <img class="ap-main" src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80" alt="KV Construction">
+      <img class="ap-sub" src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80" alt="KV Interior">
+      <div class="ap-badge"><span class="n">12+</span><span class="l">Years of<br>Excellence</span></div>
+    </div>
+    <div class="about-body rv">
+      <div class="sec-tag">About Us</div>
+      <h2 class="sec-h2">KV Infra &amp; <span>Interiors</span></h2>
+      <div class="gold-bar" style="margin:0 0 0 0"></div>
+      <p class="lead">KV Infra &amp; Interiors is a professional construction and interior design company specializing in infrastructure development, CC roads, residential and commercial projects with timely execution and transparent pricing.</p>
+      <div class="feat-list">
+        <div class="feat-item"><div class="feat-icon"><i class="fas fa-hard-hat"></i></div><div class="feat-text"><h4>Experienced &amp; Skilled Team</h4><p>Seasoned professionals with expertise across 500+ successfully delivered projects.</p></div></div>
+        <div class="feat-item"><div class="feat-icon"><i class="fas fa-gem"></i></div><div class="feat-text"><h4>Quality Materials &amp; Modern Techniques</h4><p>Premium certified materials with the latest construction methods and technology.</p></div></div>
+        <div class="feat-item"><div class="feat-icon"><i class="fas fa-clock"></i></div><div class="feat-text"><h4>On-Time Project Delivery</h4><p>Committed to completing every project on schedule without compromise on quality.</p></div></div>
+        <div class="feat-item"><div class="feat-icon"><i class="fas fa-handshake"></i></div><div class="feat-text"><h4>Transparent Pricing — No Hidden Costs</h4><p>Upfront honest quotes with detailed breakdown and total client satisfaction.</p></div></div>
+      </div>
+      <a href="#contact" class="btn-gold" style="display:inline-flex"><i class="fas fa-phone"></i> Contact Us Today</a>
+    </div>
+  </div>
+</div></section>
+
+<!-- SERVICES -->
+<section id="services"><div class="container">
+  <div class="sec-head rv">
+    <div class="sec-tag">What We Do</div>
+    <h2 class="sec-h2">Our <span>Services</span></h2>
+    <div class="gold-bar"></div>
+    <p class="sec-p" style="margin-top:16px">Comprehensive construction and interior services to fulfil every building need.</p>
+  </div>
+  <div class="srv-grid">
+    <div class="srv-card rv"><div class="srv-icon"><i class="fas fa-building"></i></div><h3>Construction</h3><p>Residential, commercial &amp; industrial construction built with premium materials ensuring durability and elegance.</p><a href="#contact" class="srv-link">Get Quote <i class="fas fa-arrow-right"></i></a></div>
+    <div class="srv-card rv"><div class="srv-icon"><i class="fas fa-couch"></i></div><h3>Interior Design</h3><p>Custom interior design solutions transforming spaces into beautiful, functional environments tailored to you.</p><a href="#contact" class="srv-link">Get Quote <i class="fas fa-arrow-right"></i></a></div>
+    <div class="srv-card rv"><div class="srv-icon"><i class="fas fa-road"></i></div><h3>CC Road Works</h3><p>Durable concrete &amp; cement road construction with superior engineering using high-grade materials.</p><a href="#contact" class="srv-link">Get Quote <i class="fas fa-arrow-right"></i></a></div>
+    <div class="srv-card rv"><div class="srv-icon"><i class="fas fa-tools"></i></div><h3>Renovations</h3><p>Complete renovation and remodeling — upgrades that revitalise your space with modern aesthetics.</p><a href="#contact" class="srv-link">Get Quote <i class="fas fa-arrow-right"></i></a></div>
+    <div class="srv-card rv"><div class="srv-icon"><i class="fas fa-city"></i></div><h3>Commercial Projects</h3><p>End-to-end commercial construction from office complexes to retail spaces, managed with precision.</p><a href="#contact" class="srv-link">Get Quote <i class="fas fa-arrow-right"></i></a></div>
+    <div class="srv-card rv"><div class="srv-icon"><i class="fas fa-home"></i></div><h3>Residential Projects</h3><p>Dream homes and villas built to last — quality, comfort and vision brought together.</p><a href="#contact" class="srv-link">Get Quote <i class="fas fa-arrow-right"></i></a></div>
+  </div>
+</div></section>
+
+<!-- WHY -->
+<section id="why"><div class="container">
+  <div class="sec-head rv">
+    <div class="sec-tag" style="color:var(--gold)">Why Choose Us</div>
+    <h2 class="sec-h2" style="color:var(--white)">Why <span>KV Infra</span> &amp; Interiors?</h2>
+    <div class="gold-bar"></div>
+    <p class="sec-p" style="margin-top:16px;color:rgba(255,255,255,.52)">We build more than structures — we build trust, quality and lasting relationships.</p>
+  </div>
+  <div class="why-grid">
+    <div class="why-card rv"><div class="why-ic"><i class="fas fa-medal"></i></div><h3>Proven Experience</h3><p>12+ years and 500+ successful projects delivering exceptional results across Andhra Pradesh.</p></div>
+    <div class="why-card rv"><div class="why-ic"><i class="fas fa-shield-alt"></i></div><h3>Quality Guaranteed</h3><p>Certified premium-grade materials with rigorous quality control at every construction stage.</p></div>
+    <div class="why-card rv"><div class="why-ic"><i class="fas fa-calendar-check"></i></div><h3>On-Time Delivery</h3><p>Disciplined project management ensures timely completion without compromising quality.</p></div>
+    <div class="why-card rv"><div class="why-ic"><i class="fas fa-rupee-sign"></i></div><h3>Transparent Pricing</h3><p>Honest upfront quotes with detailed breakdowns — zero hidden costs, zero surprises.</p></div>
+    <div class="why-card rv"><div class="why-ic"><i class="fas fa-users"></i></div><h3>Client-Centric</h3><p>Your vision drives us. We collaborate closely so every detail aligns with your expectations.</p></div>
+    <div class="why-card rv"><div class="why-ic"><i class="fas fa-leaf"></i></div><h3>Sustainable Methods</h3><p>Eco-friendly practices and sustainable materials wherever possible to protect our environment.</p></div>
+  </div>
+</div></section>
+
+<!-- PROJECTS -->
+<section id="projects"><div class="container">
+  <div class="sec-head rv">
+    <div class="sec-tag">Our Portfolio</div>
+    <h2 class="sec-h2">Featured <span>Projects</span></h2>
+    <div class="gold-bar"></div>
+    <p class="sec-p" style="margin-top:16px">Finest work across construction, roads and interior design throughout Andhra Pradesh.</p>
+  </div>
+  <div class="proj-grid">
+    <div class="proj-item rv"><img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1000&q=80" alt="Residential"><div class="proj-ov"><div><h3>Luxury Residential Complex</h3><p>Construction · Hyderabad</p></div></div></div>
+    <div class="proj-item rv"><img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&q=80" alt="Road"><div class="proj-ov"><div><h3>CC Road Development</h3><p>Infrastructure · Vijayawada</p></div></div></div>
+    <div class="proj-item rv"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80" alt="Interior"><div class="proj-ov"><div><h3>Modern Interior Design</h3><p>Interiors · Commercial</p></div></div></div>
+    <div class="proj-item rv"><img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80" alt="Commercial"><div class="proj-ov"><div><h3>Commercial Office Block</h3><p>Construction · Guntur</p></div></div></div>
+    <div class="proj-item rv"><img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=600&q=80" alt="Renovation"><div class="proj-ov"><div><h3>Complete Home Renovation</h3><p>Renovation · Residential</p></div></div></div>
+  </div>
+</div></section>
+
+<!-- REVIEWS -->
+<section id="reviews"><div class="container">
+  <div class="sec-head rv">
+    <div class="sec-tag">Testimonials</div>
+    <h2 class="sec-h2">What Our <span>Clients Say</span></h2>
+    <div class="gold-bar"></div>
+    <p class="sec-p" style="margin-top:16px">Real feedback from valued clients — their satisfaction is our greatest achievement.</p>
+  </div>
+  <div class="rev-grid" id="rev-grid">
+    <!-- Populated by JS from Firebase / localStorage -->
+  </div>
+</div></section>
+
+<!-- CONTACT -->
+<section id="contact"><div class="container">
+  <div class="sec-head rv">
+    <div class="sec-tag" style="color:var(--gold)">Get In Touch</div>
+    <h2 class="sec-h2" style="color:var(--white)">Contact <span>Us</span></h2>
+    <div class="gold-bar"></div>
+    <p class="sec-p" style="margin-top:16px;color:rgba(255,255,255,.52)">Fill in your details — we'll reach you within 24 hours and send a WhatsApp confirmation.</p>
+  </div>
+  <div class="contact-grid">
+    <div class="ci rv">
+      <h3>Let's Build Your Vision</h3>
+      <p>Whether it's new construction, an interior makeover, or a road project — we're here to help. Submit the form and our team will reach out within 24 hours.</p>
+      <div class="cd"><div class="cd-icon"><i class="fas fa-phone-alt"></i></div><div class="cd-text"><span>Call Us Anytime</span><strong>+91 9014718381</strong></div></div>
+      <div class="cd"><div class="cd-icon"><i class="fab fa-whatsapp"></i></div><div class="cd-text"><span>WhatsApp</span><strong>+91 9014718381</strong></div></div>
+      <div class="cd"><div class="cd-icon"><i class="fas fa-envelope"></i></div><div class="cd-text"><span>Email Us</span><strong>info@kvinfra.com</strong></div></div>
+      <div class="cd"><div class="cd-icon"><i class="fas fa-map-marker-alt"></i></div><div class="cd-text"><span>Location</span><strong>Vijayawada, Andhra Pradesh</strong></div></div>
+      <a href="https://wa.me/919014718381" target="_blank" class="btn-wa-main"><i class="fab fa-whatsapp" style="font-size:20px"></i> Chat on WhatsApp Now</a>
+    </div>
+    <div class="cf rv">
+      <div class="cf-row">
+        <div class="fg"><label>Your Name *</label><input type="text" id="f-name" placeholder="e.g. Rajesh Kumar"></div>
+        <div class="fg"><label>Phone Number *</label><input type="tel" id="f-phone" placeholder="+91 9000000000"></div>
+      </div>
+      <div class="fg"><label>Email Address</label><input type="email" id="f-email" placeholder="you@email.com"></div>
+      <div class="fg"><label>Service Required</label>
+        <select id="f-service">
+          <option value="">Select a Service</option>
+          <option>Construction — Residential</option>
+          <option>Construction — Commercial</option>
+          <option>Interior Design</option>
+          <option>CC Road Works</option>
+          <option>Renovations &amp; Remodeling</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Project Message</label><textarea id="f-msg" placeholder="Tell us about your project, location, budget…"></textarea></div>
+      <button class="btn-submit" id="f-submit" onclick="submitForm()"><i class="fas fa-paper-plane"></i> Send Enquiry</button>
+      <div class="wa-note"><i class="fab fa-whatsapp"></i> After submitting, your details are sent via WhatsApp to our team for an instant response.</div>
+      <div id="cf-status"></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="fb fc">
+      <a href="#home" class="nav-logo" style="display:inline-flex">
+        <div class="logo-box" style="width:44px;height:44px">
+          <svg viewBox="0 0 36 36" fill="none" style="width:28px;height:28px">
+            <rect x="3" y="14" width="11" height="19" fill="#0b1a3d" rx="1"/>
+            <rect x="5" y="16" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="9" y="16" width="3" height="3" fill="#c8a021" rx="0.5"/>
+            <rect x="5" y="21" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="9" y="21" width="3" height="3" fill="#c8a021" rx="0.5"/>
+            <rect x="6" y="26" width="5" height="7" fill="#c8a021" rx="0.5"/>
+            <rect x="16" y="6" width="13" height="27" fill="#0b1a3d" rx="1"/>
+            <rect x="18" y="9" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="23" y="9" width="3" height="3" fill="#c8a021" rx="0.5"/>
+            <rect x="18" y="15" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="23" y="15" width="3" height="3" fill="#c8a021" rx="0.5"/>
+            <rect x="18" y="21" width="3" height="3" fill="#c8a021" rx="0.5"/><rect x="23" y="21" width="3" height="3" fill="#c8a021" rx="0.5"/>
+            <rect x="20" y="27" width="5" height="6" fill="#c8a021" rx="0.5"/>
+            <rect x="2" y="33" width="32" height="1.5" fill="#c8a021" rx="0.75"/>
+            <polygon points="26,2 27.2,5.5 31,5.5 28.2,7.5 29.3,11 26,9 22.7,11 23.8,7.5 21,5.5 24.8,5.5" fill="#e8bc2a"/>
+          </svg>
+        </div>
+        <div class="logo-text"><span class="t1"><span>KV</span> Infra</span><span class="t2">& Interiors</span></div>
+      </a>
+      <p>Professional construction and interior design company specializing in infrastructure development, CC roads, residential and commercial projects across Andhra Pradesh.</p>
+      <div class="socials">
+        <a href="#" class="s-btn"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://wa.me/919014718381" class="s-btn" style="color:#25d366"><i class="fab fa-whatsapp"></i></a>
+        <a href="#" class="s-btn"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="s-btn"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <div class="fc"><h4>Quick Links</h4><ul>
+      <li><a href="#home">Home</a></li><li><a href="#about">About Us</a></li>
+      <li><a href="#services">Services</a></li><li><a href="#projects">Projects</a></li>
+      <li><a href="#reviews">Testimonials</a></li><li><a href="#contact">Contact</a></li>
+    </ul></div>
+    <div class="fc"><h4>Services</h4><ul>
+      <li><a href="#services">Construction</a></li><li><a href="#services">Interior Design</a></li>
+      <li><a href="#services">CC Road Works</a></li><li><a href="#services">Renovations</a></li>
+      <li><a href="#services">Commercial</a></li><li><a href="#services">Residential</a></li>
+    </ul></div>
+    <div class="fc"><h4>Contact Info</h4>
+      <div class="fci"><i class="fas fa-phone-alt"></i><span>+91 9014718381</span></div>
+      <div class="fci"><i class="fab fa-whatsapp"></i><span>+91 9014718381</span></div>
+      <div class="fci"><i class="fas fa-envelope"></i><span>info@kvinfra.com</span></div>
+      <div class="fci"><i class="fas fa-globe"></i><span>www.kvinfra.com</span></div>
+      <div class="fci"><i class="fas fa-map-marker-alt"></i><span>Vijayawada, Andhra Pradesh</span></div>
+    </div>
+  </div>
+  <div class="footer-bot">
+    <p>© 2025 <span>KV Infra &amp; Interiors</span>. All Rights Reserved.</p>
+    <p>Designed with <span>♥</span> for Building Your Vision</p>
+  </div>
+</footer>
+
+<a href="https://wa.me/919014718381" target="_blank" class="fab-wa"><i class="fab fa-whatsapp"></i></a>
+<button id="to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-chevron-up"></i></button>
+
+<script>
+const WA = '919014718381';
+
+// Default reviews always shown
+const DEFAULT_REVIEWS = [
+  {name:'Rajesh Kumar',   role:'Homeowner, Vijayawada', stars:5, text:'KV Infra built our dream home exactly as we envisioned. Outstanding quality and attention to detail. Highly recommend!'},
+  {name:'Suresh Reddy',   role:'Colony President, Guntur', stars:5, text:'Their CC road work was completed on schedule and quality is truly exceptional. Very professional and skilled team.'},
+  {name:'Priya Sharma',   role:'Business Owner, Hyderabad', stars:5, text:'The interior design team transformed our office into a stunning workspace. Creative, quality materials, on-time delivery.'},
+  {name:'Venkat Rao',     role:'Builder, Vijayawada', stars:5, text:'Partnered with KV Infra on multiple commercial projects. Their workmanship and transparent pricing is second to none.'}
+];
+
+// ── Slider ──
+let cur = 0;
+const total = 4;
+let si;
+function goSlide(n){ cur=n; document.getElementById('slides').style.transform=`translateX(-${n*100}%)`; document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===n)); }
+function changeSlide(d){ goSlide((cur+d+total)%total); }
+function startSlider(){ si=setInterval(()=>changeSlide(1),5500); }
+const sw=document.getElementById('slides');
+sw.addEventListener('mouseenter',()=>clearInterval(si));
+sw.addEventListener('mouseleave',startSlider);
+startSlider();
+
+// ── Nav scroll ──
+const navEl=document.getElementById('nav');
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  navEl.classList.toggle('scrolled',y>60);
+  document.getElementById('to-top').classList.toggle('show',y>450);
+  document.querySelectorAll('section[id]').forEach(s=>{
+    if(y>=s.offsetTop-110 && y<s.offsetTop-110+s.offsetHeight){
+      document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+      const a=document.querySelector(`.nav-links a[href="#${s.id}"]`);
+      if(a) a.classList.add('active');
+    }
+  });
+});
+
+// ── Mobile menu ──
+function toggleMob(){ document.getElementById('mob-menu').classList.toggle('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.getElementById('mob-menu').classList.remove('open'); });
+
+// ── Reveal ──
+const ro=new IntersectionObserver(entries=>entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); }),{threshold:0.1});
+document.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+
+// ── Count up ──
+const co=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(e.isIntersecting && !e.target.dataset.done){
+    e.target.dataset.done=1;
+    const t=+e.target.dataset.t, step=Math.ceil(t/65); let c=0;
+    const ti=setInterval(()=>{ c=Math.min(c+step,t); e.target.textContent=c+'+'; if(c>=t)clearInterval(ti); },28);
+  }
+}),{threshold:0.5});
+document.querySelectorAll('.stat-n').forEach(el=>co.observe(el));
+
+// ── Reviews: load from Firebase then fall back to localStorage ──
+async function loadReviews(){
+  let extras = [];
+  const fb = window._FB;
+  if(fb && fb.fbReady){
+    try{
+      const snap = await fb.getDocs(fb.query(fb.collection(fb.db,'reviews'), fb.orderBy('timestamp','desc')));
+      snap.forEach(d=>extras.push(d.data()));
+    }catch(e){ extras = JSON.parse(localStorage.getItem('kv_reviews')||'[]'); }
+  } else {
+    extras = JSON.parse(localStorage.getItem('kv_reviews')||'[]');
+  }
+  renderReviews([...DEFAULT_REVIEWS,...extras]);
+}
+
+function renderReviews(list){
+  const grid=document.getElementById('rev-grid');
+  grid.innerHTML=list.map(r=>`
+    <div class="rev-card rv">
+      <div class="rev-stars">${'★'.repeat(r.stars||5)}${'☆'.repeat(5-(r.stars||5))}</div>
+      <p>"${r.text||r.review}"</p>
+      <div class="rev-author">
+        <div class="rev-av">${(r.name||'?')[0]}</div>
+        <div><div class="rev-name">${r.name}</div><div class="rev-role">${r.role||r.designation||'Client'}</div></div>
+      </div>
+    </div>`).join('');
+  grid.querySelectorAll('.rv').forEach(el=>ro.observe(el));
+}
+loadReviews();
+
+// ── Contact form ──
+async function submitForm(){
+  const name=document.getElementById('f-name').value.trim();
+  const phone=document.getElementById('f-phone').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  const service=document.getElementById('f-service').value;
+  const msg=document.getElementById('f-msg').value.trim();
+  const st=document.getElementById('cf-status');
+  const btn=document.getElementById('f-submit');
+
+  if(!name||!phone){ st.textContent='⚠ Please enter your name and phone number.'; st.className='er'; st.style.display='block'; return; }
+
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Sending…';
+  const data={name,phone,email,service,msg,ts:new Date().toISOString()};
+
+  // Save to Firebase
+  const fb=window._FB;
+  if(fb && fb.fbReady){
+    try{ await fb.addDoc(fb.collection(fb.db,'leads'),{...data,timestamp:fb.serverTimestamp()}); }
+    catch(e){ saveLocal(data); }
+  } else { saveLocal(data); }
+
+  // Open WhatsApp
+  const waText=encodeURIComponent(
+    `🏗️ *New Enquiry — KV Infra & Interiors*\n\n`+
+    `👤 *Name:* ${name}\n📞 *Phone:* ${phone}\n📧 *Email:* ${email||'Not provided'}\n`+
+    `🛠️ *Service:* ${service||'Not specified'}\n📝 *Message:* ${msg||'No message'}\n\n`+
+    `📅 ${new Date().toLocaleString('en-IN')}`
+  );
+  window.open(`https://wa.me/${WA}?text=${waText}`,'_blank');
+
+  st.textContent='✓ Enquiry sent! WhatsApp opened — we will contact you within 24 hours.';
+  st.className='ok'; st.style.display='block';
+  ['f-name','f-phone','f-email','f-msg'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-service').value='';
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-paper-plane"></i> Send Enquiry';
+  setTimeout(()=>st.style.display='none',8000);
+}
+
+function saveLocal(data){
+  const leads=JSON.parse(localStorage.getItem('kv_leads')||'[]');
+  leads.unshift(data); localStorage.setItem('kv_leads',JSON.stringify(leads));
+}
+</script>
+</body>
+</html>
