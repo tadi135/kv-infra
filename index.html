@@ -22,18 +22,18 @@
 
   // ─── PASTE YOUR CONFIG HERE ───────────────
   const firebaseConfig = {
-    apiKey:            "YOUR_API_KEY",
-    authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId:         "YOUR_PROJECT_ID",
-    storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId:             "YOUR_APP_ID"
-  };
+  apiKey: "AIzaSyA_ANe0aeW6rapZhssW8M0nEpRE_uUmbIw",
+  authDomain: "kv-infra-2717d.firebaseapp.com",
+  projectId: "kv-infra-2717d",
+  storageBucket: "kv-infra-2717d.firebasestorage.app",
+  messagingSenderId: "866660537390",
+  appId: "1:866660537390:web:db0e81312bfe86f1683bbf",
+  measurementId: "G-M0J04HVBPY"  };
   // ──────────────────────────────────────────
 
   let app, db, fbReady = false;
   try {
-    if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    if (firebaseConfig.apiKey !== "AIzaSyA_ANe0aeW6rapZhssW8M0nEpRE_uUmbIw") {
       app = initializeApp(firebaseConfig);
       db  = getFirestore(app);
       fbReady = true;
@@ -478,7 +478,7 @@ footer{background:var(--dark);border-top:1px solid rgba(200,160,33,.17);padding:
       <p>Whether it's new construction, an interior makeover, or a road project — we're here to help. Submit the form and our team will reach out within 24 hours.</p>
       <div class="cd"><div class="cd-icon"><i class="fas fa-phone-alt"></i></div><div class="cd-text"><span>Call Us Anytime</span><strong>+91 9014718381</strong></div></div>
       <div class="cd"><div class="cd-icon"><i class="fab fa-whatsapp"></i></div><div class="cd-text"><span>WhatsApp</span><strong>+91 9014718381</strong></div></div>
-      <div class="cd"><div class="cd-icon"><i class="fas fa-envelope"></i></div><div class="cd-text"><span>Email Us</span><strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0a63646c654a617c63646c786b24696567">[email&#160;protected]</a></strong></div></div>
+      <div class="cd"><div class="cd-icon"><i class="fas fa-envelope"></i></div><div class="cd-text"><span>Email Us</span><strong>info@kvinfra.com</strong></div></div>
       <div class="cd"><div class="cd-icon"><i class="fas fa-map-marker-alt"></i></div><div class="cd-text"><span>Location</span><strong>Vijayawada, Andhra Pradesh</strong></div></div>
       <a href="https://wa.me/919014718381" target="_blank" class="btn-wa-main"><i class="fab fa-whatsapp" style="font-size:20px"></i> Chat on WhatsApp Now</a>
     </div>
@@ -550,7 +550,7 @@ footer{background:var(--dark);border-top:1px solid rgba(200,160,33,.17);padding:
     <div class="fc"><h4>Contact Info</h4>
       <div class="fci"><i class="fas fa-phone-alt"></i><span>+91 9014718381</span></div>
       <div class="fci"><i class="fab fa-whatsapp"></i><span>+91 9014718381</span></div>
-      <div class="fci"><i class="fas fa-envelope"></i><span>kvinfra@gmail.com</div>
+      <div class="fci"><i class="fas fa-envelope"></i><span>info@kvinfra.com</span></div>
       <div class="fci"><i class="fas fa-globe"></i><span>www.kvinfra.com</span></div>
       <div class="fci"><i class="fas fa-map-marker-alt"></i><span>Vijayawada, Andhra Pradesh</span></div>
     </div>
@@ -564,7 +564,7 @@ footer{background:var(--dark);border-top:1px solid rgba(200,160,33,.17);padding:
 <a href="https://wa.me/919014718381" target="_blank" class="fab-wa"><i class="fab fa-whatsapp"></i></a>
 <button id="to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-chevron-up"></i></button>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 const WA = '919014718381';
 
 // Default reviews always shown
@@ -684,4 +684,15 @@ async function submitForm(){
   st.textContent='✓ Enquiry sent! WhatsApp opened — we will contact you within 24 hours.';
   st.className='ok'; st.style.display='block';
   ['f-name','f-phone','f-email','f-msg'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-service').v
+  document.getElementById('f-service').value='';
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-paper-plane"></i> Send Enquiry';
+  setTimeout(()=>st.style.display='none',8000);
+}
+
+function saveLocal(data){
+  const leads=JSON.parse(localStorage.getItem('kv_leads')||'[]');
+  leads.unshift(data); localStorage.setItem('kv_leads',JSON.stringify(leads));
+}
+</script>
+</body>
+</html>
